@@ -13,6 +13,10 @@ vericup = "BgJSdxW7zKzg5r5sctQoxEbc73pEeiaFGj3ebqvR8gnd"
 [programs.localnet]
 vericup = "BgJSdxW7zKzg5r5sctQoxEbc73pEeiaFGj3ebqvR8gnd"
 
+[[test.genesis]]
+address = "6pW64gN1s2uqjHkn1unFeEjAwJkPGHoppGvS715wyP2J"
+program = "target/deploy/mock_txoracle.so"
+
 [registry]
 url = "https://api.apr.dev"
 
