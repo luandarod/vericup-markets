@@ -4,6 +4,7 @@ use anchor_spl::{
     token::{self, Mint, MintTo, Token, TokenAccount, Transfer},
 };
 
+declare_program!(txoracle);
 declare_id!("BgJSdxW7zKzg5r5sctQoxEbc73pEeiaFGj3ebqvR8gnd");
 
 const PLAY_DECIMALS: u8 = 6;
@@ -104,6 +105,115 @@ pub mod vericup {
             ),
             amount,
         )
+    }
+
+    pub fn lock_market(ctx: Context<LockMarket>) -> Result<()> {
+        require!(
+            ctx.accounts.market.state == MarketState::Open,
+            VeriCupError::MarketClosed
+        );
+        require!(
+            Clock::get()?.unix_timestamp >= ctx.accounts.market.kickoff,
+            VeriCupError::MarketStillOpen
+        );
+        ctx.accounts.market.state = MarketState::Locked;
+        Ok(())
+    }
+
+    pub fn resolve_with_txline(
+        ctx: Context<ResolveWithTxline>,
+        payload: txoracle::types::StatValidationInput,
+    ) -> Result<()> {
+        use txoracle::types::{Comparison, NDimensionalStrategy, StatPredicate, TraderPredicate};
+
+        require!(
+            ctx.accounts.market.state == MarketState::Locked,
+            VeriCupError::MarketNotLocked
+        );
+        require!(
+            payload.fixture_summary.fixture_id >= 0
+                && payload.fixture_summary.fixture_id as u64 == ctx.accounts.market.fixture_id,
+            VeriCupError::FixtureMismatch
+        );
+        require!(payload.stats.len() == 2, VeriCupError::InvalidScoreProof);
+
+        let home = &payload.stats[0].stat;
+        let away = &payload.stats[1].stat;
+        require!(
+            home.key == 1 && away.key == 2,
+            VeriCupError::InvalidScoreProof
+        );
+        require!(
+            home.period == 100 && away.period == 100,
+            VeriCupError::ScoreNotFinal
+        );
+        require!(
+            home.value >= 0 && away.value >= 0,
+            VeriCupError::InvalidScoreProof
+        );
+
+        let strategy = NDimensionalStrategy {
+            geometric_targets: vec![],
+            distance_predicate: None,
+            discrete_predicates: vec![
+                StatPredicate::Single {
+                    index: 0,
+                    predicate: TraderPredicate {
+                        threshold: home.value,
+                        comparison: Comparison::EqualTo,
+                    },
+                },
+                StatPredicate::Single {
+                    index: 1,
+                    predicate: TraderPredicate {
+                        threshold: away.value,
+                        comparison: Comparison::EqualTo,
+                    },
+                },
+            ],
+        };
+        let proof_hash = solana_keccak_hasher::hash(&payload.try_to_vec()?).to_bytes();
+        let home_score = home.value;
+        let away_score = away.value;
+
+        txoracle::cpi::validate_stat_v2(
+            CpiContext::new(
+                ctx.accounts.txoracle_program.to_account_info(),
+                txoracle::cpi::accounts::ValidateStatV2 {
+                    daily_scores_merkle_roots: ctx
+                        .accounts
+                        .daily_scores_merkle_roots
+                        .to_account_info(),
+                },
+            ),
+            payload,
+            strategy,
+        )?;
+
+        let (returning_program, return_data) =
+            anchor_lang::solana_program::program::get_return_data()
+                .ok_or(VeriCupError::MissingOracleReturn)?;
+        require_keys_eq!(
+            returning_program,
+            txoracle::ID,
+            VeriCupError::InvalidOracleReturn
+        );
+        let verified = bool::try_from_slice(&return_data)
+            .map_err(|_| error!(VeriCupError::InvalidOracleReturn))?;
+        require!(verified, VeriCupError::ProofRejected);
+
+        let market = &mut ctx.accounts.market;
+        market.resolved_outcome = Some(if home_score > away_score {
+            Outcome::Home
+        } else if home_score < away_score {
+            Outcome::Away
+        } else {
+            Outcome::Draw
+        });
+        market.proof_hash = proof_hash;
+        market.resolution_slot = Clock::get()?.slot;
+        market.state = MarketState::Resolved;
+        Ok(())
     }
 }
 
@@ -218,6 +328,29 @@ pub struct TakePosition<'info> {
     pub system_program: Program<'info, System>,
 }
 
+#[derive(Accounts)]
+pub struct LockMarket<'info> {
+    #[account(
+        mut,
+        seeds = [b"market".as_ref(), market.fixture_id.to_le_bytes().as_ref()],
+        bump = market.bump
+    )]
+    pub market: Account<'info, Market>,
+}
+
+#[derive(Accounts)]
+pub struct ResolveWithTxline<'info> {
+    #[account(
+        mut,
+        seeds = [b"market".as_ref(), market.fixture_id.to_le_bytes().as_ref()],
+        bump = market.bump
+    )]
+    pub market: Account<'info, Market>,
+    /// CHECK: TxLINE validates this account during the CPI.
+    pub daily_scores_merkle_roots: UncheckedAccount<'info>,
+    pub txoracle_program: Program<'info, txoracle::program::Txoracle>,
+}
+
 #[account]
 #[derive(InitSpace)]
 pub struct ProtocolConfig {
@@ -295,6 +428,22 @@ pub enum VeriCupError {
     InvalidAmount,
     #[msg("Market is not accepting positions")]
     MarketClosed,
+    #[msg("Market cannot be locked before kickoff")]
+    MarketStillOpen,
+    #[msg("Market must be locked before resolution")]
+    MarketNotLocked,
+    #[msg("TxLINE proof fixture does not match the market")]
+    FixtureMismatch,
+    #[msg("TxLINE proof must contain the final home and away score leaves")]
+    InvalidScoreProof,
+    #[msg("TxLINE score leaves are not final")]
+    ScoreNotFinal,
+    #[msg("TxLINE did not return a validation result")]
+    MissingOracleReturn,
+    #[msg("TxLINE returned malformed validation data")]
+    InvalidOracleReturn,
+    #[msg("TxLINE rejected the submitted Merkle proof")]
+    ProofRejected,
     #[msg("Arithmetic overflow")]
     ArithmeticOverflow,
 }

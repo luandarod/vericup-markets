@@ -83,8 +83,17 @@ describe("TxLINE market resolution", () => {
       })
       .rpc();
 
-    await new Promise((resolve) => setTimeout(resolve, 1_500));
-    await program.methods.lockMarket().accounts({ market }).rpc();
+    for (let attempt = 0; attempt < 10; attempt += 1) {
+      try {
+        await program.methods.lockMarket().accounts({ market }).rpc();
+        return { fixtureId, market };
+      } catch (error) {
+        if (attempt === 9 || !(error instanceof Error) || !error.message.includes("MarketStillOpen")) {
+          throw error;
+        }
+        await new Promise((resolve) => setTimeout(resolve, 500));
+      }
+    }
     return { fixtureId, market };
   }
 

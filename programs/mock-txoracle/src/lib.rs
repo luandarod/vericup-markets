@@ -11,8 +11,8 @@ pub mod mock_txoracle {
         payload: StatValidationInput,
         strategy: NDimensionalStrategy,
     ) -> Result<bool> {
-        let valid_stats = payload.stats.len() == 2
-            && payload.stats.iter().all(|leaf| leaf.stat.period == 100);
+        let valid_stats =
+            payload.stats.len() == 2 && payload.stats.iter().all(|leaf| leaf.stat.period == 100);
         let valid_predicates = strategy.discrete_predicates.len() == 2;
         Ok(valid_stats && valid_predicates)
     }
