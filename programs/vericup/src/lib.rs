@@ -215,6 +215,98 @@ pub mod vericup {
         market.state = MarketState::Resolved;
         Ok(())
     }
+
+    pub fn claim_payout(ctx: Context<SettlePosition>, _outcome: Outcome) -> Result<()> {
+        let market = &mut ctx.accounts.market;
+        require!(
+            market.state == MarketState::Resolved,
+            VeriCupError::MarketNotResolved
+        );
+        require!(!ctx.accounts.position.claimed, VeriCupError::AlreadyClaimed);
+
+        let winner = market
+            .resolved_outcome
+            .ok_or(VeriCupError::MarketNotResolved)?;
+        require!(
+            ctx.accounts.position.outcome == winner,
+            VeriCupError::WrongOutcome
+        );
+
+        let total_pool = market
+            .pools
+            .iter()
+            .try_fold(0_u64, |sum, value| sum.checked_add(*value))
+            .ok_or(VeriCupError::ArithmeticOverflow)?;
+        let winner_pool = market.pools[winner.index()];
+        require!(winner_pool > 0, VeriCupError::NoWinningPool);
+
+        let claimed_winning_stake = market
+            .claimed_winning_stake
+            .checked_add(ctx.accounts.position.amount)
+            .ok_or(VeriCupError::ArithmeticOverflow)?;
+        require!(
+            claimed_winning_stake <= winner_pool,
+            VeriCupError::ArithmeticOverflow
+        );
+        let payout = if claimed_winning_stake == winner_pool {
+            total_pool
+                .checked_sub(market.claimed_payout)
+                .ok_or(VeriCupError::ArithmeticOverflow)?
+        } else {
+            u64::try_from(
+                (u128::from(ctx.accounts.position.amount) * u128::from(total_pool))
+                    / u128::from(winner_pool),
+            )
+            .map_err(|_| error!(VeriCupError::ArithmeticOverflow))?
+        };
+
+        ctx.accounts.position.claimed = true;
+        market.claimed_winning_stake = claimed_winning_stake;
+        market.claimed_payout = market
+            .claimed_payout
+            .checked_add(payout)
+            .ok_or(VeriCupError::ArithmeticOverflow)?;
+
+        transfer_market_tokens(&ctx, payout)
+    }
+
+    pub fn refund_position(ctx: Context<SettlePosition>, _outcome: Outcome) -> Result<()> {
+        let market = &ctx.accounts.market;
+        require!(
+            market.state == MarketState::Resolved,
+            VeriCupError::MarketNotResolved
+        );
+        require!(!ctx.accounts.position.claimed, VeriCupError::AlreadyClaimed);
+        let winner = market
+            .resolved_outcome
+            .ok_or(VeriCupError::MarketNotResolved)?;
+        require!(
+            market.pools[winner.index()] == 0,
+            VeriCupError::WinningPoolExists
+        );
+
+        let refund = ctx.accounts.position.amount;
+        ctx.accounts.position.claimed = true;
+        transfer_market_tokens(&ctx, refund)
+    }
+}
+
+fn transfer_market_tokens(ctx: &Context<SettlePosition>, amount: u64) -> Result<()> {
+    let fixture_bytes = ctx.accounts.market.fixture_id.to_le_bytes();
+    let bump = [ctx.accounts.market.bump];
+    let signer_seeds: &[&[u8]] = &[b"market", fixture_bytes.as_ref(), bump.as_ref()];
+    token::transfer(
+        CpiContext::new_with_signer(
+            ctx.accounts.token_program.to_account_info(),
+            Transfer {
+                from: ctx.accounts.vault.to_account_info(),
+                to: ctx.accounts.user_play.to_account_info(),
+                authority: ctx.accounts.market.to_account_info(),
+            },
+            &[signer_seeds],
+        ),
+        amount,
+    )
 }
 
 #[derive(Accounts)]
@@ -351,6 +443,42 @@ pub struct ResolveWithTxline<'info> {
     pub txoracle_program: Program<'info, txoracle::program::Txoracle>,
 }
 
+#[derive(Accounts)]
+#[instruction(outcome: Outcome)]
+pub struct SettlePosition<'info> {
+    #[account(mut)]
+    pub user: Signer<'info>,
+    #[account(
+        mut,
+        seeds = [b"market".as_ref(), market.fixture_id.to_le_bytes().as_ref()],
+        bump = market.bump
+    )]
+    pub market: Account<'info, Market>,
+    #[account(
+        mut,
+        seeds = [b"position".as_ref(), market.key().as_ref(), user.key().as_ref(), &[outcome.index() as u8]],
+        bump = position.bump,
+        has_one = market,
+        constraint = position.owner == user.key() @ VeriCupError::WrongOwner,
+        constraint = position.outcome == outcome @ VeriCupError::WrongOutcome
+    )]
+    pub position: Account<'info, Position>,
+    #[account(
+        mut,
+        address = market.vault,
+        token::mint = market.play_mint,
+        token::authority = market
+    )]
+    pub vault: Account<'info, TokenAccount>,
+    #[account(
+        mut,
+        token::mint = market.play_mint,
+        token::authority = user
+    )]
+    pub user_play: Account<'info, TokenAccount>,
+    pub token_program: Program<'info, Token>,
+}
+
 #[account]
 #[derive(InitSpace)]
 pub struct ProtocolConfig {
@@ -444,6 +572,18 @@ pub enum VeriCupError {
     InvalidOracleReturn,
     #[msg("TxLINE rejected the submitted Merkle proof")]
     ProofRejected,
+    #[msg("Market has not been resolved")]
+    MarketNotResolved,
+    #[msg("Only winning positions can claim a payout")]
+    WrongOutcome,
+    #[msg("Position does not belong to this wallet")]
+    WrongOwner,
+    #[msg("This position was already settled")]
+    AlreadyClaimed,
+    #[msg("The resolved outcome has no winning pool")]
+    NoWinningPool,
+    #[msg("Refunds are unavailable because the resolved outcome has winners")]
+    WinningPoolExists,
     #[msg("Arithmetic overflow")]
     ArithmeticOverflow,
 }
