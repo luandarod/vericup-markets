@@ -18,6 +18,16 @@ importers:
         specifier: 4.1.10
         version: 4.1.10(@types/node@24.13.3)(@vitest/coverage-v8@4.1.10)(vite@8.1.4(@types/node@24.13.3))
 
+  keeper:
+    dependencies:
+      '@vericup/txline':
+        specifier: workspace:*
+        version: link:../packages/txline
+    devDependencies:
+      typescript:
+        specifier: 5.9.3
+        version: 5.9.3
+
   packages/txline:
     dependencies:
       zod:
