@@ -34,7 +34,7 @@ Do not start a later task while its predecessor has failing checks. Do not use r
 - Create: `package.json`
 - Create: `pnpm-workspace.yaml`
 - Create: `tsconfig.base.json`
-- Create: `vitest.workspace.ts`
+- Create: `vitest.config.ts`
 - Create: `rust-toolchain.toml`
 - Create: `Anchor.toml`
 - Create: `Cargo.toml`
@@ -48,12 +48,15 @@ Use Ubuntu WSL because the host does not currently expose Rust, Solana, or Ancho
 
 ```bash
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs -o /tmp/rustup-init.sh
-sh /tmp/rustup-init.sh -s -- -y
+sha256sum /tmp/rustup-init.sh
+sh /tmp/rustup-init.sh -y
 . "$HOME/.cargo/env"
+sudo apt-get update
+sudo apt-get install -y build-essential pkg-config libssl-dev libudev-dev
 sh -c "$(curl -sSfL https://release.anza.xyz/v2.3.0/install)"
 export PATH="$HOME/.local/share/solana/install/active_release/bin:$PATH"
 cargo install --git https://github.com/solana-foundation/anchor avm --force
-avm install 0.32.1
+avm install 0.32.1 --from-source
 avm use 0.32.1
 ```
 
@@ -183,16 +186,25 @@ Run:
 
 ```bash
 pnpm install
-pnpm test -- --passWithNoTests
+cargo update -p blake3 --precise 1.8.2
+cargo update -p borsh@1.7.0 --precise 1.5.7
+cargo update -p proc-macro-crate@3.5.0 --precise 3.1.0
+cargo update -p indexmap@2.14.0 --precise 2.10.0
+cargo update -p zeroize@1.9.0 --precise 1.8.1
+cargo update -p zeroize_derive@1.5.0 --precise 1.4.2
+cargo update -p unicode-segmentation@1.13.3 --precise 1.10.1
+pnpm exec vitest run --passWithNoTests
 anchor build
 ```
 
-Expected: dependency installation succeeds, Vitest reports no tests without failure, and Anchor produces `target/deploy/vericup.so`.
+The Cargo pins mirror versions compatible with the Rust 1.84 compiler bundled in Solana 2.3.0 and prevent newer Edition 2024 transitive releases from breaking SBF builds. On WSL repositories mounted under `/mnt/c`, set `CARGO_TARGET_DIR` to a Linux path for `anchor idl build`, then copy only the generated IDL into `target/idl/`; this avoids P9 filesystem stalls.
+
+Expected: dependency installation succeeds, Vitest reports no tests without failure, Anchor produces `target/deploy/vericup.so`, and the generated IDL address matches the program keypair public key.
 
 - [ ] **Step 5: Commit the bootstrap**
 
 ```bash
-git add .gitignore .env.example package.json pnpm-workspace.yaml tsconfig.base.json vitest.workspace.ts rust-toolchain.toml Anchor.toml Cargo.toml programs idls pnpm-lock.yaml
+git add .gitignore .env.example package.json pnpm-workspace.yaml tsconfig.base.json vitest.config.ts rust-toolchain.toml Anchor.toml Cargo.toml programs idls pnpm-lock.yaml
 git commit -m "build: bootstrap VeriCup workspace"
 ```
 

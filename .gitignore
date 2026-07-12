@@ -1,1 +1,9 @@
 .worktrees/
+.env
+.env.local
+.anchor/
+.next/
+coverage/
+node_modules/
+target/
+test-ledger/

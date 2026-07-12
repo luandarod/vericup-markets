@@ -1,0 +1,20 @@
+{
+  "name": "vericup-markets",
+  "private": true,
+  "packageManager": "pnpm@11.7.0",
+  "scripts": {
+    "build": "pnpm --filter @vericup/txline build && pnpm --filter @vericup/keeper build && pnpm --filter @vericup/app build",
+    "lint": "pnpm -r lint",
+    "typecheck": "pnpm -r typecheck",
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage",
+    "test:program": "anchor test",
+    "test:e2e": "pnpm --filter @vericup/app test:e2e"
+  },
+  "devDependencies": {
+    "@vitest/coverage-v8": "4.1.10",
+    "typescript": "5.9.3",
+    "vitest": "4.1.10"
+  }
+}
+
