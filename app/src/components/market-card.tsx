@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-type Outcome = "Brasil" | "Empate" | "Japão";
+type Outcome = "HOME" | "DRAW" | "AWAY";
 
 export function MarketCard({
   home,
@@ -15,13 +15,14 @@ export function MarketCard({
   kickoff: string;
   pools: [number, number, number];
 }) {
-  const [selected, setSelected] = useState<Outcome>("Brasil");
+  const [selected, setSelected] = useState<Outcome>("HOME");
   const [amount, setAmount] = useState("25");
-  const outcomes: Array<{ label: Outcome; name: string; pool: number }> = [
-    { label: "Brasil", name: home, pool: pools[0] },
-    { label: "Empate", name: "Empate", pool: pools[1] },
-    { label: "Japão", name: away, pool: pools[2] }
+  const outcomes: Array<{ code: Outcome; name: string; pool: number }> = [
+    { code: "HOME", name: home, pool: pools[0] },
+    { code: "DRAW", name: "Empate", pool: pools[1] },
+    { code: "AWAY", name: away, pool: pools[2] }
   ];
+  const selectedName = outcomes.find((outcome) => outcome.code === selected)?.name;
 
   return (
     <section className="market-card" aria-label={`${home} contra ${away}`}>
@@ -37,9 +38,9 @@ export function MarketCard({
       <div className="outcomes">
         {outcomes.map((outcome) => (
           <button
-            aria-pressed={selected === outcome.label}
-            key={outcome.label}
-            onClick={() => setSelected(outcome.label)}
+            aria-pressed={selected === outcome.code}
+            key={outcome.code}
+            onClick={() => setSelected(outcome.code)}
             type="button"
           >
             <span>{outcome.name}</span>
@@ -58,7 +59,7 @@ export function MarketCard({
         <b>PLAY</b>
       </label>
       <button className="primary-action" disabled={!amount || Number(amount) <= 0} type="button">
-        Confirmar {selected}
+        Confirmar {selectedName}
       </button>
       <p className="helper">Demonstração local. A transação real exige carteira na Solana devnet.</p>
     </section>

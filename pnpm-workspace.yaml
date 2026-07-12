@@ -2,6 +2,8 @@ packages:
   - app
   - keeper
   - packages/*
+overrides:
+  serialize-javascript: 7.0.3
 allowBuilds:
   bigint-buffer: false
   bufferutil: false

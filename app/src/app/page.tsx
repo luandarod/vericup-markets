@@ -7,7 +7,7 @@ export default function Home() {
       <nav className="nav shell" aria-label="Principal">
         <a className="brand" href="#top">VERICUP</a>
         <div><a href="#prova">Prova</a><a href="#arquitetura">Arquitetura</a></div>
-        <a className="nav-cta" href="https://github.com" rel="noreferrer" target="_blank">Ver código</a>
+        <a className="nav-cta" href="#mercado">Testar</a>
       </nav>
 
       <section className="hero shell" id="top">

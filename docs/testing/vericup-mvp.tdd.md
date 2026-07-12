@@ -10,6 +10,10 @@
 | UI | 2 componentes ausentes | 2 passing |
 | Replay | módulo ausente | 2 passing |
 
+Cobertura final TypeScript: 86,08% statements, 83,17% branches, 96,55% funções e 87,37% linhas.
+
 Checkpoints RED e GREEN permanecem separados no histórico Git. Os testes Anchor rodam em ledger novo com mock TxLINE carregado no endereço oficial exclusivamente no genesis local.
 
 Gap conhecido: publicação devnet, ativação de token TxLINE e teste com o oracle remoto dependem de carteira, fundos devnet e credenciais do mantenedor. Não foram simulados como evidência real.
+
+Supply chain: `pnpm audit --prod --audit-level high` passa. A auditoria completa ainda aponta `bigint-buffer@1.1.5`, transitiva de `@solana/spl-token` usado nos testes. O advisory indica 1.1.6, mas essa versão não está publicada. Seus scripts nativos permanecem explicitamente bloqueados em `allowBuilds`.
