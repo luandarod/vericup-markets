@@ -6,10 +6,10 @@ import { MarketCard } from "./market-card";
 
 describe("MarketCard", () => {
   it("registers a walletless guest prediction", () => {
-    render(<MarketCard home="Brasil" away="Japão" kickoff="16 JUN, 22:00" pools={[482, 126, 209]} />);
+    render(<MarketCard home="França" away="Espanha" kickoff="14 JUL, 19:00 UTC" pools={[612, 488, 351]} />);
 
-    expect(screen.getAllByText("Brasil").length).toBeGreaterThan(0);
-    expect(screen.getAllByText("Japão").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("França").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("Espanha").length).toBeGreaterThan(0);
 
     const draw = screen.getByRole("button", { name: /empate/i });
     fireEvent.click(draw);

@@ -11,7 +11,7 @@ export function HeroMarket() {
     <>
       <nav className="nav shell" aria-label="Principal">
         <a className="brand" href="#top">VERICUP</a>
-        <div><a href="#prova">Prova</a><a href="#arquitetura">Arquitetura</a></div>
+        <div><a href="#copa">Copa</a><a href="#prova">Prova</a><a href="#arquitetura">Arquitetura</a></div>
         <button className="nav-cta" onClick={focusMarket} type="button">Testar</button>
       </nav>
 
@@ -23,7 +23,7 @@ export function HeroMarket() {
           <button className="hero-cta" onClick={focusMarket} type="button">Testar mercado</button>
         </div>
         <div id="mercado" className="hero-product">
-          <MarketCard focusKey={focusKey} home="Brasil" away="Japão" kickoff="16 JUN, 22:00" pools={[482, 126, 209]} />
+          <MarketCard focusKey={focusKey} home="França" away="Espanha" kickoff="14 JUL, 19:00 UTC" pools={[612, 488, 351]} />
         </div>
       </section>
     </>

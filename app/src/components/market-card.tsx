@@ -42,7 +42,7 @@ export function MarketCard({
   return (
     <section className={`market-card${prompted ? " is-prompted" : ""}`} aria-label={`${home} contra ${away}`} ref={cardRef}>
       <div className="fixture-meta">
-        <span>GRUPO C</span>
+        <span>SEMIFINAL · TXLINE #18237038</span>
         <time>{kickoff}</time>
       </div>
       <div className="teams">

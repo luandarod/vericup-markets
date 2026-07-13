@@ -1,7 +1,6 @@
-import { txlineServerConfig } from "../../../../lib/txline-server";
 import { NextResponse } from "next/server";
-
-const DEMO_FIXTURE_ID = 18175981;
+import { txlineServerConfig } from "../../../../lib/txline-server";
+import { WORLD_CUP_COMPETITION_ID } from "../../../../lib/world-cup-fixtures";
 
 export async function GET() {
   const config = txlineServerConfig();
@@ -10,7 +9,7 @@ export async function GET() {
   }
 
   try {
-    const response = await fetch(`${config.origin}/api/scores/snapshot/${DEMO_FIXTURE_ID}`, {
+    const response = await fetch(`${config.origin}/api/fixtures/snapshot?competitionId=${WORLD_CUP_COMPETITION_ID}`, {
       cache: "no-store",
       headers: {
         Accept: "application/json",

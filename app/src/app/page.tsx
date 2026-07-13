@@ -1,4 +1,5 @@
 import { ApiStatus } from "../components/api-status";
+import { CupFixtureGrid } from "../components/cup-fixture-grid";
 import { HeroMarket } from "../components/hero-market";
 import { ProofReceipt } from "../components/proof-receipt";
 
@@ -9,9 +10,11 @@ export default function Home() {
 
       <section className="signal-strip" aria-label="Garantias">
         <div className="shell">
-          <span>Sem carteira</span><ApiStatus /><span>Prova Solana opcional</span><span>PLAY sem valor real</span>
+          <span>Sem carteira</span><ApiStatus /><span>Copa inteira</span><span>PLAY sem valor real</span>
         </div>
       </section>
+
+      <CupFixtureGrid />
 
       <section className="proof-section shell" id="prova">
         <div className="section-copy">
@@ -26,7 +29,7 @@ export default function Home() {
         <div className="flow" aria-label="Fluxo de resolução">
           <article><b>Torcedor</b><p>Registra palpite convidado com PLAY virtual.</p></article>
           <span aria-hidden="true">-&gt;</span>
-          <article><b>TxLINE + Keeper</b><p>Recebe SSE, trava mercados e calcula o resultado.</p></article>
+          <article><b>TxLINE + Keeper</b><p>Recebe SSE, snapshots e proofs para travar mercados e calcular o resultado.</p></article>
           <span aria-hidden="true">-&gt;</span>
           <article><b>Prova opcional</b><p>Valida CPI na Solana e gera recibo verificável.</p></article>
         </div>
