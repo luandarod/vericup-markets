@@ -6,20 +6,21 @@ import { MarketCard } from "./market-card";
 
 describe("MarketCard", () => {
   it("registers a walletless guest prediction", () => {
-    render(<MarketCard home="Brasil" away="Japao" kickoff="16 JUN, 22:00" pools={[482, 126, 209]} />);
+    render(<MarketCard home="Brasil" away="Japão" kickoff="16 JUN, 22:00" pools={[482, 126, 209]} />);
 
     expect(screen.getAllByText("Brasil").length).toBeGreaterThan(0);
-    expect(screen.getAllByText("Japao").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("Japão").length).toBeGreaterThan(0);
 
     const draw = screen.getByRole("button", { name: /empate/i });
     fireEvent.click(draw);
 
     expect(draw).toHaveAttribute("aria-pressed", "true");
-    expect(screen.getByText(/nenhuma carteira necessaria/i)).toBeVisible();
+    expect(screen.getByText(/nenhuma carteira necessária/i)).toBeVisible();
 
     fireEvent.click(screen.getByRole("button", { name: /registrar empate/i }));
 
     expect(screen.getByRole("status")).toHaveTextContent(/palpite registrado/i);
     expect(screen.getByRole("status")).toHaveTextContent(/empate/i);
+    expect(screen.getByRole("status")).toHaveTextContent(/aguardar o placar TxLINE/i);
   });
 });

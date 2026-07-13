@@ -53,7 +53,7 @@ export function MarketCard({
         ))}
       </div>
       <label className="amount-field">
-        <span>POSICAO</span>
+        <span>POSIÇÃO</span>
         <input
           aria-label="Quantidade de PLAY"
           inputMode="numeric"
@@ -71,13 +71,15 @@ export function MarketCard({
         onClick={() => setReceipt({ outcome: selectedName, amount })}
         type="button"
       >
-        Registrar {selectedName}
+        {receipt ? "Palpite registrado" : `Registrar ${selectedName}`}
       </button>
-      <p className="helper">Nenhuma carteira necessaria. PLAY e pontuacao virtual para a demo.</p>
+      <p className="helper">Nenhuma carteira necessária. PLAY é pontuação virtual para a demo.</p>
       {receipt ? (
-        <p className="guest-receipt" role="status">
-          Palpite registrado: {receipt.outcome}, {receipt.amount} PLAY.
-        </p>
+        <div className="guest-receipt" role="status">
+          <b>Palpite registrado</b>
+          <span>{receipt.outcome}, {receipt.amount} PLAY</span>
+          <small>Próximo passo: aguardar o placar TxLINE para liquidação.</small>
+        </div>
       ) : null}
     </section>
   );

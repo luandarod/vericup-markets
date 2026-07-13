@@ -13,12 +13,12 @@ export default function Home() {
       <section className="hero shell" id="top">
         <div className="hero-copy">
           <p className="eyebrow">MERCADOS DA COPA SEM CARTEIRA</p>
-          <h1>Voce preve. A prova liquida.</h1>
+          <h1>Você prevê. A prova liquida.</h1>
           <p className="lede">Palpites convidados com PLAY virtual, placares TxLINE e uma camada Solana opcional para provar o resultado quando isso importa.</p>
           <a className="hero-cta" href="#mercado">Testar mercado</a>
         </div>
         <div id="mercado" className="hero-product">
-          <MarketCard home="Brasil" away="Japao" kickoff="16 JUN, 22:00" pools={[482, 126, 209]} />
+          <MarketCard home="Brasil" away="Japão" kickoff="16 JUN, 22:00" pools={[482, 126, 209]} />
         </div>
       </section>
 
@@ -30,26 +30,26 @@ export default function Home() {
 
       <section className="proof-section shell" id="prova">
         <div className="section-copy">
-          <h2>O placar nao entra pela confianca.</h2>
-          <p>O keeper observa TxLINE, deriva o resultado e pode enviar a prova Merkle para o programa Anchor. A carteira fica no lado operacional, nao no caminho do torcedor.</p>
+          <h2>O placar não entra pela confiança.</h2>
+          <p>O keeper observa TxLINE, deriva o resultado e pode enviar a prova Merkle para o programa Anchor. A carteira fica no lado operacional, não no caminho do torcedor.</p>
         </div>
         <ProofReceipt fixtureId={18175981} score="2 - 1" slot={421337991} hash="a19c72f6e8b42291147f9a9bdac33f08" />
       </section>
 
       <section className="architecture shell" id="arquitetura">
         <h2>Um caminho curto para acertar e provar.</h2>
-        <div className="flow" aria-label="Fluxo de resolucao">
+        <div className="flow" aria-label="Fluxo de resolução">
           <article><b>Torcedor</b><p>Registra palpite convidado com PLAY virtual.</p></article>
           <span aria-hidden="true">-&gt;</span>
           <article><b>TxLINE + Keeper</b><p>Recebe SSE, trava mercados e calcula o resultado.</p></article>
           <span aria-hidden="true">-&gt;</span>
-          <article><b>Prova opcional</b><p>Valida CPI na Solana e gera recibo verificavel.</p></article>
+          <article><b>Prova opcional</b><p>Valida CPI na Solana e gera recibo verificável.</p></article>
         </div>
       </section>
 
       <footer className="footer shell">
-        <div><strong>VERICUP MARKETS</strong><p>Settlement esportivo verificavel.</p></div>
-        <p>Construido para o TxODDS Prediction Markets and Settlement bounty.</p>
+        <div><strong>VERICUP MARKETS</strong><p>Settlement esportivo verificável.</p></div>
+        <p>Construído para o TxODDS Prediction Markets and Settlement bounty.</p>
       </footer>
     </main>
   );
