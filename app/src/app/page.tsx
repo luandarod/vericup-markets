@@ -1,4 +1,4 @@
-import { MarketCard } from "../components/market-card";
+import { HeroMarket } from "../components/hero-market";
 import { ProofReceipt } from "../components/proof-receipt";
 
 export default function Home() {
@@ -10,17 +10,7 @@ export default function Home() {
         <a className="nav-cta" href="#mercado">Testar</a>
       </nav>
 
-      <section className="hero shell" id="top">
-        <div className="hero-copy">
-          <p className="eyebrow">MERCADOS DA COPA SEM CARTEIRA</p>
-          <h1>Você prevê. A prova liquida.</h1>
-          <p className="lede">Palpites convidados com PLAY virtual, placares TxLINE e uma camada Solana opcional para provar o resultado quando isso importa.</p>
-          <a className="hero-cta" href="#mercado">Testar mercado</a>
-        </div>
-        <div id="mercado" className="hero-product">
-          <MarketCard home="Brasil" away="Japão" kickoff="16 JUN, 22:00" pools={[482, 126, 209]} />
-        </div>
-      </section>
+      <HeroMarket />
 
       <section className="signal-strip" aria-label="Garantias">
         <div className="shell">

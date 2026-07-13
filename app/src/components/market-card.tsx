@@ -1,15 +1,17 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 type Outcome = "HOME" | "DRAW" | "AWAY";
 
 export function MarketCard({
+  focusKey = 0,
   home,
   away,
   kickoff,
   pools
 }: {
+  focusKey?: number;
   home: string;
   away: string;
   kickoff: string;
@@ -17,7 +19,10 @@ export function MarketCard({
 }) {
   const [selected, setSelected] = useState<Outcome>("HOME");
   const [amount, setAmount] = useState("25");
+  const [prompted, setPrompted] = useState(false);
   const [receipt, setReceipt] = useState<{ outcome: string; amount: string } | null>(null);
+  const cardRef = useRef<HTMLElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
   const outcomes: Array<{ code: Outcome; name: string; pool: number }> = [
     { code: "HOME", name: home, pool: pools[0] },
     { code: "DRAW", name: "Empate", pool: pools[1] },
@@ -25,8 +30,17 @@ export function MarketCard({
   ];
   const selectedName = outcomes.find((outcome) => outcome.code === selected)?.name ?? home;
 
+  useEffect(() => {
+    if (focusKey === 0) return;
+    cardRef.current?.scrollIntoView?.({ block: "center", behavior: "smooth" });
+    inputRef.current?.focus();
+    setPrompted(true);
+    const timeout = window.setTimeout(() => setPrompted(false), 1400);
+    return () => window.clearTimeout(timeout);
+  }, [focusKey]);
+
   return (
-    <section className="market-card" aria-label={`${home} contra ${away}`}>
+    <section className={`market-card${prompted ? " is-prompted" : ""}`} aria-label={`${home} contra ${away}`} ref={cardRef}>
       <div className="fixture-meta">
         <span>GRUPO C</span>
         <time>{kickoff}</time>
@@ -61,6 +75,7 @@ export function MarketCard({
             setAmount(event.target.value);
             setReceipt(null);
           }}
+          ref={inputRef}
           value={amount}
         />
         <b>PLAY</b>
