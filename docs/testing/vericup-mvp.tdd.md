@@ -16,4 +16,4 @@ Checkpoints RED e GREEN permanecem separados no histórico Git. Os testes Anchor
 
 Gap conhecido: publicação devnet, ativação de token TxLINE e teste com o oracle remoto dependem de carteira, fundos devnet e credenciais do mantenedor. Não foram simulados como evidência real.
 
-Supply chain: `pnpm audit --prod --audit-level high` passa. A auditoria completa ainda aponta `bigint-buffer@1.1.5`, transitiva de `@solana/spl-token` usado nos testes. O advisory indica 1.1.6, mas essa versão não está publicada. Seus scripts nativos permanecem explicitamente bloqueados em `allowBuilds`.
+Supply chain: `pnpm audit --audit-level low` passa. Os testes Anchor usam helpers locais para SPL Token, evitando a dependência JavaScript `@solana/spl-token` e removendo a vulnerabilidade transitiva `bigint-buffer@1.1.5`.

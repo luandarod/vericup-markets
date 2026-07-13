@@ -4,7 +4,7 @@ import {
   TOKEN_PROGRAM_ID,
   getAccount,
   getOrCreateAssociatedTokenAccount
-} from "@solana/spl-token";
+} from "./token-helpers";
 import { expect } from "chai";
 
 const TXORACLE_PROGRAM = new anchor.web3.PublicKey(

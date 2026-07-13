@@ -1,14 +1,15 @@
 import { NextResponse } from "next/server";
+import { txlineServerConfig } from "../../../../lib/txline-server";
 
 export async function GET() {
-  const { TXLINE_ORIGIN, TXLINE_JWT, TXLINE_API_TOKEN } = process.env;
-  if (!TXLINE_ORIGIN || !TXLINE_JWT || !TXLINE_API_TOKEN) {
-    return NextResponse.json({ error: "TxLINE is not configured" }, { status: 503 });
+  const config = txlineServerConfig();
+  if (!config.configured) {
+    return NextResponse.json({ error: "TxLINE is not configured", missing: config.missing }, { status: 503 });
   }
   try {
-    const response = await fetch(`${TXLINE_ORIGIN.replace(/\/$/, "")}/api/fixtures`, {
+    const response = await fetch(`${config.origin}/api/fixtures`, {
       cache: "no-store",
-      headers: { Authorization: `Bearer ${TXLINE_JWT}`, "X-Api-Token": TXLINE_API_TOKEN }
+      headers: { Authorization: `Bearer ${config.jwt}`, "X-Api-Token": config.apiToken }
     });
     if (!response.ok) throw new Error("Upstream failure");
     return NextResponse.json(await response.json());

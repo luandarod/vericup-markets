@@ -6,7 +6,7 @@
 
 **Architecture:** A pnpm workspace contains a Next.js application, a small shared TxLINE client, and an automatic keeper. The primary fan path uses walletless guest predictions and virtual PLAY. An Anchor 0.32.1 proof layer owns PLAY-token vaults, validates final score stats through TxLINE `validateStatV2`, resolves HOME/DRAW/AWAY deterministically, and pays claims for technical verification. Local tests use a compatible mock validation program; the submission gate uses TxLINE's real devnet program and IDL.
 
-**Tech Stack:** Node.js 24, pnpm 11, TypeScript 5.9, Next.js 16, React 19, Vitest 4, Playwright 1.61, Anchor 0.32.1, Rust, Solana CLI 2.3.0, `@solana/web3.js` 1.98, `@solana/spl-token` 0.4, Zod 4, TxLINE devnet API and program `6pW64gN1s2uqjHkn1unFeEjAwJkPGHoppGvS715wyP2J`.
+**Tech Stack:** Node.js 24, pnpm 11, TypeScript 5.9, Next.js 16, React 19, Vitest 4, Playwright 1.61, Anchor 0.32.1, Rust, Solana CLI 2.3.0, `@solana/web3.js` 1.98, local SPL Token test helpers, Zod 4, TxLINE devnet API and program `6pW64gN1s2uqjHkn1unFeEjAwJkPGHoppGvS715wyP2J`.
 
 ---
 

@@ -5,7 +5,7 @@ import {
   createMint,
   getAccount,
   getOrCreateAssociatedTokenAccount
-} from "@solana/spl-token";
+} from "./token-helpers";
 import { expect } from "chai";
 
 async function expectFailure(promise: Promise<unknown>): Promise<void> {

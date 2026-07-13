@@ -1,3 +1,4 @@
+import { ApiStatus } from "../components/api-status";
 import { HeroMarket } from "../components/hero-market";
 import { ProofReceipt } from "../components/proof-receipt";
 
@@ -8,7 +9,7 @@ export default function Home() {
 
       <section className="signal-strip" aria-label="Garantias">
         <div className="shell">
-          <span>Sem carteira</span><span>TxLINE IDL 1.5.6</span><span>Prova Solana opcional</span><span>PLAY sem valor real</span>
+          <span>Sem carteira</span><ApiStatus /><span>Prova Solana opcional</span><span>PLAY sem valor real</span>
         </div>
       </section>
 
