@@ -2,9 +2,9 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Build and deploy a devnet-only World Cup pari-mutuel market whose final outcome is computed from a TxLINE `game_finalised` score proof and settled through an on-chain CPI.
+**Goal:** Build a World Cup prediction market where judges can register a guest prediction without a wallet, while the final outcome is computed from a TxLINE `game_finalised` score proof and can be proven through an on-chain CPI.
 
-**Architecture:** A pnpm workspace contains a Next.js application, a small shared TxLINE client, and an automatic keeper. An Anchor 0.32.1 program owns PLAY-token vaults, validates final score stats through TxLINE `validateStatV2`, resolves HOME/DRAW/AWAY deterministically, and pays claims. Local tests use a compatible mock validation program; the submission gate uses TxLINE's real devnet program and IDL.
+**Architecture:** A pnpm workspace contains a Next.js application, a small shared TxLINE client, and an automatic keeper. The primary fan path uses walletless guest predictions and virtual PLAY. An Anchor 0.32.1 proof layer owns PLAY-token vaults, validates final score stats through TxLINE `validateStatV2`, resolves HOME/DRAW/AWAY deterministically, and pays claims for technical verification. Local tests use a compatible mock validation program; the submission gate uses TxLINE's real devnet program and IDL.
 
 **Tech Stack:** Node.js 24, pnpm 11, TypeScript 5.9, Next.js 16, React 19, Vitest 4, Playwright 1.61, Anchor 0.32.1, Rust, Solana CLI 2.3.0, `@solana/web3.js` 1.98, `@solana/spl-token` 0.4, Zod 4, TxLINE devnet API and program `6pW64gN1s2uqjHkn1unFeEjAwJkPGHoppGvS715wyP2J`.
 
@@ -717,14 +717,14 @@ The page contains exactly:
 
 - concise hero explaining verifiable settlement;
 - network and feed-health badge;
-- one featured market card with fixture, kickoff, TxLINE StablePrice, and on-chain pool distribution;
-- wallet connection and one-time PLAY faucet action;
+- one featured market card with fixture, kickoff, TxLINE StablePrice, and virtual pool distribution;
+- guest prediction action that does not require a wallet;
 - HOME/DRAW/AWAY position actions;
 - live or replay score status;
 - settlement safety checklist;
 - proof receipt and claim/refund action.
 
-Server routes import `@vericup/txline` and read credentials from `TXLINE_GUEST_JWT` and `TXLINE_API_TOKEN`. They return a controlled `503` with `lastUpdated` when upstream is unavailable and never serialize credentials. `program.ts` derives all PDAs locally and sends transactions through the connected wallet; it does not accept result selection from UI state.
+Server routes import `@vericup/txline` and read credentials from `TXLINE_GUEST_JWT` and `TXLINE_API_TOKEN`. They return a controlled `503` with `lastUpdated` when upstream is unavailable and never serialize credentials. Any Solana transaction lives in proof mode and uses an operator wallet, not a required fan wallet.
 
 - [ ] **Step 4: Run GREEN, accessibility checks, typecheck, and build**
 
@@ -798,7 +798,7 @@ Expected: both targets fail because replay behavior is absent.
 
 - [ ] **Step 4: Activate the TxLINE devnet free tier**
 
-Run the repository script with one funded devnet wallet. It must:
+Run the repository script with one funded operator devnet wallet. This is required for TxLINE activation and proof mode, not for the fan-facing guest prediction flow. It must:
 
 1. subscribe to service level `1` for four weeks with empty selected leagues;
 2. obtain a guest JWT from `https://txline-dev.txodds.com/auth/guest/start`;
@@ -899,16 +899,15 @@ Expected: the first command finds no secrets; the second finds TxLINE mint only 
 
 - [ ] **Step 4: Re-run the real judge path**
 
-Using the deployed site and a clean devnet wallet:
+Using the deployed site as a fresh judge:
 
-1. connect wallet;
-2. claim PLAY once;
-3. take a position;
-4. run the clearly labeled replay;
-5. observe TxLINE CPI resolution;
-6. claim or refund;
-7. open both Explorer links;
-8. follow the README from a fresh checkout.
+1. register a guest prediction without connecting a wallet;
+2. run the clearly labeled replay;
+3. observe TxLINE-backed resolution;
+4. inspect the demo proof receipt;
+5. run the optional operator-wallet proof path;
+6. open the Explorer links produced by proof mode;
+7. follow the README from a fresh checkout.
 
 Record fresh signatures and screenshots for the demo, but do not commit wallet keys or API tokens.
 

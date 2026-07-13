@@ -2,7 +2,7 @@
 
 ## Purpose
 
-VeriCup Markets is a new hackathon project for the TxODDS Prediction Markets and Settlement track. It demonstrates a complete prediction-market lifecycle on Solana devnet: market creation, demo-token positions, TxLINE-backed result validation, deterministic settlement, and winner claims.
+VeriCup Markets is a new hackathon project for the TxODDS Prediction Markets and Settlement track. It demonstrates a walletless World Cup prediction flow backed by TxLINE data, with an optional Solana proof layer for TxLINE-backed result validation, deterministic settlement, and winner claims.
 
 The project is separate from `brazil-world-cup-squad-optimizer` because the hackathon requires a new build created specifically for the event. It uses no real-money assets and does not provide gambling or financial services.
 
@@ -11,7 +11,7 @@ The project is separate from `brazil-world-cup-squad-optimizer` because the hack
 The product is a verifiable settlement engine presented through an approachable World Cup prediction-market interface. Its primary demonstration is:
 
 ```text
-TxLINE result -> on-chain validation CPI -> market resolution -> claim -> Explorer receipt
+Guest prediction -> TxLINE result -> deterministic resolution -> optional on-chain validation CPI -> proof receipt
 ```
 
 TxLINE is essential to the resolution path rather than an optional data display. The product prioritizes a working, inspectable settlement flow over a complex exchange or forecasting model.
@@ -20,8 +20,8 @@ TxLINE is essential to the resolution path rather than an optional data display.
 
 ### Required MVP
 
-- Next.js interface with Solana wallet support.
-- Anchor program deployable to Solana devnet.
+- Next.js interface that lets judges register a guest prediction without a wallet.
+- Anchor program deployable to Solana devnet as an optional proof layer.
 - Match-result markets with `HOME`, `DRAW`, and `AWAY` outcomes.
 - SPL demo token named `PLAY`, with no monetary value.
 - PDA-controlled market vault.
@@ -48,13 +48,13 @@ TxLINE is essential to the resolution path rather than an optional data display.
 
 ```text
 Next.js application
-  |-- wallet connection and demo-token flow
+  |-- guest prediction and virtual PLAY flow
   |-- fixtures, StablePrice, pools, and market state
   |-- proof receipt and Explorer links
   `-- server-only TxLINE proxy for protected credentials
               |
               v
-Anchor program on Solana devnet
+Optional Anchor proof layer on Solana devnet
   |-- market and position accounts
   |-- PDA vault authority
   |-- create, position, lock, resolve, and claim instructions
@@ -123,7 +123,7 @@ Integer division rounds down. Any final remainder stays in the vault until the l
 1. The keeper obtains current fixtures from TxLINE.
 2. A fixture becomes a market with its immutable TxLINE identifier and kickoff.
 3. The application displays server-fetched TxLINE StablePrice data and current on-chain pool totals.
-4. A user connects a devnet wallet, obtains PLAY, and takes a position.
+4. A user registers a guest prediction with virtual PLAY and no wallet.
 5. At kickoff, the keeper locks the market; the program timestamp also blocks late deposits.
 6. The keeper receives a final score through the TxLINE stream and obtains its validation material.
 7. The keeper submits `resolve_with_txline` with the required TxLINE accounts and proof data.
@@ -163,11 +163,11 @@ If TxLINE's devnet examples require a specific fixture or validation primitive, 
 
 The main screen prioritizes three connected views:
 
-1. **Market:** fixture, kickoff, pool distribution, StablePrice, wallet balance, and position action.
+1. **Market:** fixture, kickoff, pool distribution, StablePrice, guest balance, and position action.
 2. **Live data:** current TxLINE score/feed status and timestamp.
 3. **Proof receipt:** validation status, final score, TxLINE program, slot, market transaction, claim transaction, and Explorer links.
 
-The core judge journey is: connect a devnet wallet, obtain PLAY, take a position, run or observe a verified replay, claim, and inspect the receipt.
+The core judge journey is: open the app, register a guest prediction, run or observe a verified replay, inspect the receipt, and optionally inspect the Solana proof mode.
 
 ## Testing Strategy
 
@@ -195,7 +195,7 @@ Development follows test-driven RED-GREEN-REFACTOR cycles.
 
 - complete lifecycle on a local validator with a compatible mock validation program;
 - real TxLINE validation on devnet as the submission gate;
-- wallet, position, receipt, resolution, and claim flow in Playwright;
+- guest prediction, receipt, resolution, optional proof, and claim flow in Playwright;
 - responsive and accessible critical states.
 
 New code targets at least 80% automated coverage. Completion requires fresh evidence for tests, lint, type checks, builds, dependency audits, secret scans, devnet validation, and the documented judge journey.
@@ -215,7 +215,7 @@ New code targets at least 80% automated coverage. Completion requires fresh evid
 
 1. Explain the trust problem in sports-market settlement.
 2. Show a VeriCup market powered by TxLINE fixtures and StablePrice.
-3. Connect a wallet and deposit PLAY on an outcome.
+3. Register a walletless guest prediction on an outcome.
 4. Run a verified historical replay.
 5. Show the TxLINE validation CPI resolving the market.
 6. Claim the payout.
@@ -224,4 +224,4 @@ New code targets at least 80% automated coverage. Completion requires fresh evid
 
 ## Success Criteria
 
-A judge with a devnet wallet can use the deployed application to obtain PLAY, take a position, observe or trigger a TxLINE-validated resolution, claim the correct amount, inspect the on-chain receipt, and repeat the flow using the README without access to private credentials.
+A judge can use the deployed application without a wallet to register a guest prediction, observe or trigger a TxLINE-validated resolution, inspect the receipt, and repeat the flow using the README without access to private credentials. A technical judge can additionally run the Solana proof path with an operator wallet.

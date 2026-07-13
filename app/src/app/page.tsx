@@ -12,44 +12,44 @@ export default function Home() {
 
       <section className="hero shell" id="top">
         <div className="hero-copy">
-          <p className="eyebrow">MERCADOS DA COPA NA SOLANA</p>
-          <h1>Você prevê. A prova liquida.</h1>
-          <p className="lede">Resultados TxLINE verificados on-chain, payouts determinísticos e nenhuma decisão escondida no backend.</p>
+          <p className="eyebrow">MERCADOS DA COPA SEM CARTEIRA</p>
+          <h1>Voce preve. A prova liquida.</h1>
+          <p className="lede">Palpites convidados com PLAY virtual, placares TxLINE e uma camada Solana opcional para provar o resultado quando isso importa.</p>
           <a className="hero-cta" href="#mercado">Testar mercado</a>
         </div>
         <div id="mercado" className="hero-product">
-          <MarketCard home="Brasil" away="Japão" kickoff="16 JUN, 22:00" pools={[482, 126, 209]} />
+          <MarketCard home="Brasil" away="Japao" kickoff="16 JUN, 22:00" pools={[482, 126, 209]} />
         </div>
       </section>
 
       <section className="signal-strip" aria-label="Garantias">
         <div className="shell">
-          <span>TxLINE IDL 1.5.6</span><span>Solana devnet</span><span>12 testes Anchor</span><span>PLAY sem valor real</span>
+          <span>Sem carteira</span><span>TxLINE IDL 1.5.6</span><span>Prova Solana opcional</span><span>PLAY sem valor real</span>
         </div>
       </section>
 
       <section className="proof-section shell" id="prova">
         <div className="section-copy">
-          <h2>O placar não entra pela confiança.</h2>
-          <p>O keeper envia as folhas e provas Merkle. O programa reconstrói os predicados, chama TxLINE por CPI e deriva o vencedor.</p>
+          <h2>O placar nao entra pela confianca.</h2>
+          <p>O keeper observa TxLINE, deriva o resultado e pode enviar a prova Merkle para o programa Anchor. A carteira fica no lado operacional, nao no caminho do torcedor.</p>
         </div>
         <ProofReceipt fixtureId={18175981} score="2 - 1" slot={421337991} hash="a19c72f6e8b42291147f9a9bdac33f08" />
       </section>
 
       <section className="architecture shell" id="arquitetura">
-        <h2>Uma linha de confiança curta.</h2>
-        <div className="flow" aria-label="Fluxo de resolução">
-          <article><b>TxLINE</b><p>Score final e prova de estatística.</p></article>
-          <span aria-hidden="true">→</span>
-          <article><b>Keeper</b><p>Observa SSE, trava e envia a prova.</p></article>
-          <span aria-hidden="true">→</span>
-          <article><b>VeriCup</b><p>Valida CPI, deriva e paga no cofre.</p></article>
+        <h2>Um caminho curto para acertar e provar.</h2>
+        <div className="flow" aria-label="Fluxo de resolucao">
+          <article><b>Torcedor</b><p>Registra palpite convidado com PLAY virtual.</p></article>
+          <span aria-hidden="true">-&gt;</span>
+          <article><b>TxLINE + Keeper</b><p>Recebe SSE, trava mercados e calcula o resultado.</p></article>
+          <span aria-hidden="true">-&gt;</span>
+          <article><b>Prova opcional</b><p>Valida CPI na Solana e gera recibo verificavel.</p></article>
         </div>
       </section>
 
       <footer className="footer shell">
-        <div><strong>VERICUP MARKETS</strong><p>Settlement esportivo verificável.</p></div>
-        <p>Construído para o TxODDS Prediction Markets and Settlement bounty.</p>
+        <div><strong>VERICUP MARKETS</strong><p>Settlement esportivo verificavel.</p></div>
+        <p>Construido para o TxODDS Prediction Markets and Settlement bounty.</p>
       </footer>
     </main>
   );
