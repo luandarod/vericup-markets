@@ -1,6 +1,8 @@
 import { txlineServerConfig } from "../../../../lib/txline-server";
 import { NextResponse } from "next/server";
 
+const DEMO_FIXTURE_ID = 18175981;
+
 export async function GET() {
   const config = txlineServerConfig();
   if (!config.configured) {
@@ -8,7 +10,7 @@ export async function GET() {
   }
 
   try {
-    const response = await fetch(`${config.origin}/api/fixtures`, {
+    const response = await fetch(`${config.origin}/api/scores/snapshot/${DEMO_FIXTURE_ID}`, {
       cache: "no-store",
       headers: {
         Accept: "application/json",
